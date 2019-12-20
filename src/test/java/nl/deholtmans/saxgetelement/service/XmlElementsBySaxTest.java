@@ -67,6 +67,18 @@ public class XmlElementsBySaxTest {
         }
     }
 
-
-
+    @Test
+    public void testGetNexting() {
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            String searchContent = new Scanner(new File(classLoader.getResource("data/XmlNextingStructure.xml").getFile())).useDelimiter("\\Z").next();
+            XmlElementsBySax xmlElementsBySax = new XmlElementsBySax();
+            assertEquals( "D-data 3.2", xmlElementsBySax.getElementDataByPath( "/a/b/c/d>1", searchContent));
+            assertEquals( "G-data 4.1", xmlElementsBySax.getElementDataByPath( "/a/c/d/e>1/g", searchContent));
+            assertEquals( "", xmlElementsBySax.getElementDataByPath( "/a/c/d/e>2/g", searchContent));
+            assertEquals( "H-data 4.1", xmlElementsBySax.getElementDataByPath( "/a/b/d/e>2/h", searchContent));
+        } catch( Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

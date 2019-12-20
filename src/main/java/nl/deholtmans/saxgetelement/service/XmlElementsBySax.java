@@ -14,6 +14,8 @@ public class XmlElementsBySax {
 
     String searchPaths[];
     int searchIndex[];
+    int nextings[];
+
 
     public String getElementFromInputSource( InputSource inputSource) {
         try {
@@ -44,13 +46,18 @@ public class XmlElementsBySax {
         try {
             SAXParser saxParser = saxParserFactory.newSAXParser();
             prepareSearchingFromPath( path);
-            XmlPathElementHandler handler = new XmlPathElementHandler( searchPaths, searchIndex);
+            XmlPathElementHandler handler = new XmlPathElementHandler( searchPaths, searchIndex, nextings);
             saxParser.parse(new InputSource(new StringReader(xml)), handler);
             return handler.getResult();
         } catch( Exception e) {
             e.printStackTrace();
             return "NOK";
         }
+    }
+
+    public String getElementDataByPath(String path, String xml) {
+        String parts[] = path.substring( 1).split( "/");
+        return getElementDataByPath( parts, xml);
     }
 
     public String getElementFromInputStream( InputStream input) {
@@ -73,15 +80,23 @@ public class XmlElementsBySax {
         }
         searchPaths = new String[ searchCommand.length];
         searchIndex = new int[ searchCommand.length];
+        nextings = new int[ searchCommand.length];
         for( int i = 0; i < searchCommand.length; i++) {
             String searchCommandCurrent = searchCommand[i];
-            String[] parts = searchCommandCurrent.split( "#");
-            if( parts.length <= 1 ) {
-                searchPaths[ i] = searchCommandCurrent;
-                searchIndex[ i ] = 0;
+            String[] parts = searchCommandCurrent.split( ">");
+            if( parts.length > 1) {
+                searchPaths[i] = parts[0];
+                searchIndex[i] = 0;
+                nextings[i] = Integer.parseInt( parts[1]);
             } else {
-                searchPaths[ i] = parts[0];
-                searchIndex[ i ] = Integer.parseInt( parts[1]) - 1;
+                parts = searchCommandCurrent.split("#");
+                if (parts.length <= 1) {
+                    searchPaths[i] = searchCommandCurrent;
+                    searchIndex[i] = 0;
+                } else {
+                    searchPaths[i] = parts[0];
+                    searchIndex[i] = Integer.parseInt(parts[1]) - 1;
+                }
             }
         }
     }
